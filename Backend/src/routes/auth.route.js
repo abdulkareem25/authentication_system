@@ -1,5 +1,14 @@
 import { Router } from "express";
-import { registerValidation } from "../validators/auth.validator.js";
+import { 
+  registerValidation,
+  loginValidation
+ } from "../validators/auth.validator.js";
+import validateRequest from "../middlewares/validateRequest.js";
+import { 
+  registerUser, 
+  loginUser 
+} from "../controllers/auth.controller.js";
+
 
 const router = Router();
 
@@ -15,6 +24,20 @@ router.post(
   registerValidation,
   validateRequest,
   registerUser
+)
+
+/**
+ * @route POST /api/auth/login
+ * @desc Login a user
+ * @access Public
+ * @body { email: string, password: string }
+ */
+
+router.post(
+  '/login',
+  loginValidation,
+  validateRequest,
+  loginUser
 )
 
 export default router;

@@ -19,3 +19,35 @@ const registerUser = async (req, res) => {
     message: "User registered successfully"
   });
 };
+
+const loginUser = async (req, res) => {
+
+  const { email, password } = req.body;
+
+  // Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Check if password is correct
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
+    const error = new Error("Invalid password");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // Generate JWT token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1h"
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "User logged in successfully",
+    token
+  });
+}

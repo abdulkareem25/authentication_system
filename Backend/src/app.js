@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.route.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -17,5 +18,7 @@ app.get("/health", (req, res) => {
     message: "Server is healthy" 
   });
 });
+
+app.use(errorHandler);
 
 export default app;
