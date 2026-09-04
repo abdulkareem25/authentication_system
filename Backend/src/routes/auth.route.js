@@ -3,7 +3,7 @@ import {
   registerValidation,
   loginValidation
  } from "../validators/auth.validator.js";
-import validateRequest from "../middlewares/validateRequest.js";
+import validateRequest from "../middlewares/validate.middleware.js";
 import { 
   registerUser, 
   loginUser 

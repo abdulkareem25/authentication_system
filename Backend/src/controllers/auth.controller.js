@@ -1,4 +1,9 @@
-const registerUser = async (req, res) => {
+import asyncHandler from "../utils/asyncHandler.js";
+import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
+
+
+export const registerUser = asyncHandler(async (req, res) => {
 
   const { name, email, password } = req.body;
 
@@ -18,9 +23,9 @@ const registerUser = async (req, res) => {
     success: true,
     message: "User registered successfully"
   });
-};
+})
 
-const loginUser = async (req, res) => {
+export const loginUser = asyncHandler(async (req, res) => {
 
   const { email, password } = req.body;
 
@@ -50,4 +55,4 @@ const loginUser = async (req, res) => {
     message: "User logged in successfully",
     token
   });
-}
+})
