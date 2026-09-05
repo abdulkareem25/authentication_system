@@ -4,9 +4,12 @@ import {
   loginValidation
  } from "../validators/auth.validator.js";
 import validateRequest from "../middlewares/validate.middleware.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 import { 
   registerUser, 
-  loginUser 
+  loginUser,
+  logoutUser,
+  refreshToken
 } from "../controllers/auth.controller.js";
 
 
@@ -38,6 +41,30 @@ router.post(
   loginValidation,
   validateRequest,
   loginUser
+)
+
+/**
+ * @route POST /api/auth/logout
+ * @desc Logout a user
+ * @access Private
+ */
+
+router.post(
+  '/logout',
+  authMiddleware,
+  logoutUser
+)
+
+/**
+ * @route GET /api/auth/refresh-token
+ * @desc Refresh the auth token
+ * @access Private
+ */
+
+router.get(
+  '/refresh-token',
+  authMiddleware,
+  refreshToken
 )
 
 export default router;

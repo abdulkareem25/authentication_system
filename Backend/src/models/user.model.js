@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  refereshToken: {
+    type: String,
+  },
 }, { timestamps: true });
 
 const hashPassword = async function () {
