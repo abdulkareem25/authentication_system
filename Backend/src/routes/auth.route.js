@@ -1,17 +1,17 @@
 import { Router } from "express";
-import { 
-  registerValidation,
-  loginValidation
- } from "../validators/auth.validator.js";
-import validateRequest from "../middlewares/validate.middleware.js";
-import authMiddleware from "../middlewares/auth.middleware.js";
-import { 
-  register, 
+import {
+  getMe,
   login,
   logout,
   refreshToken,
-  getMe
+  register
 } from "../controllers/auth.controller.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
+import validateRequest from "../middlewares/validate.middleware.js";
+import {
+  loginValidation,
+  registerValidation
+} from "../validators/auth.validator.js";
 
 
 const router = Router();
@@ -71,7 +71,7 @@ router.post(
 /**
  * @route POST /api/auth/refresh-token
  * @desc Refresh the auth token
- * @access Private
+ * @access Public with refresh-token cookie
  */
 
 router.post(
