@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AuthCard from '../components/AuthCard';
 import Button from '../components/Button';
 import useAuth from '../hooks/useAuth';
@@ -7,13 +7,16 @@ const DashboardPage = () => {
   const { user, isAuthenticated, isLoading, error, fetchDashboardData, logout } = useAuth();
 
   const [dashboardData, setDashboardData] = useState(null);
+  const [dashboardError, setDashboardError] = useState(null);
   
   // Fetch dashboard data when the component mounts
-  useState(() => {
+  useEffect(() => {
     const fetchData = async () => {
       const result = await fetchDashboardData();
       if (result.success) {
         setDashboardData(result.dashboardData);
+      } else if (result.error) {
+        setDashboardError(result.error);
       }
     };
 
@@ -123,9 +126,9 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {error && (
+        {(error || dashboardError) && (
           <div className="error-alert mt-md">
-            <p>{typeof error === 'string' ? error : error?.message || 'An error occurred'}</p>
+            <p>{typeof (dashboardError || error) === 'string' ? (dashboardError || error) : (dashboardError || error)?.message || 'An error occurred'}</p>
           </div>
         )}
       </main>

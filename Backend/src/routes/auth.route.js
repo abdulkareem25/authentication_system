@@ -69,14 +69,13 @@ router.post(
 )
 
 /**
- * @route GET /api/auth/refresh-token
+ * @route POST /api/auth/refresh-token
  * @desc Refresh the auth token
  * @access Private
  */
 
-router.get(
+router.post(
   '/refresh-token',
-  authMiddleware,
   refreshToken
 )
 

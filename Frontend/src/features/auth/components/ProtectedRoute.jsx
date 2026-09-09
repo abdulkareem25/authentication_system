@@ -3,11 +3,11 @@ import useAuth from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
   
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isCheckingAuth } = useAuth();
 
   const location = useLocation();
 
-  if (loading) {
+  if (isCheckingAuth) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="text-center">

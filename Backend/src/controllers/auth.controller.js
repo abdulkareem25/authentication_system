@@ -1,5 +1,6 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 import {
   refereshTokenGenerator,
   authTokenGenerator,
@@ -61,6 +62,12 @@ export const login = asyncHandler(async (req, res) => {
     sameSite: "strict",
     maxAge: 60 * 60 * 1000, // 1 hour
   });
+  res.cookie("refreshToken", refereshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   res.status(200).json({
     success: true,
@@ -101,6 +108,11 @@ export const logout = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production", // Set to true in production
     sameSite: "strict",
   });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 
   // Clear the refresh token from the database
   req.user.refereshToken = null;
@@ -113,11 +125,26 @@ export const logout = asyncHandler(async (req, res) => {
 })
 
 export const refreshToken = asyncHandler(async (req, res) => {
+  const storedRefreshToken = req.cookies.refreshToken;
 
-  const { user } = req;
+  if (!storedRefreshToken) {
+    const error = new Error("No refresh token provided");
+    error.statusCode = 401;
+    throw error;
+  }
 
-  if (!user) {
-    const error = new Error("User not authenticated");
+  let decoded;
+  try {
+    decoded = jwt.verify(storedRefreshToken, process.env.JWT_SECRET);
+  } catch {
+    const error = new Error("Invalid refresh token");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const user = await User.findById(decoded.userId).select("+refereshToken");
+  if (!user || user.refereshToken !== storedRefreshToken) {
+    const error = new Error("Invalid refresh token");
     error.statusCode = 401;
     throw error;
   }
@@ -138,6 +165,13 @@ export const refreshToken = asyncHandler(async (req, res) => {
   // Update the refresh token in the database
   user.refereshToken = refereshToken;
   await user.save();
+
+  res.cookie("refreshToken", refereshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   res.status(200).json({
     success: true,

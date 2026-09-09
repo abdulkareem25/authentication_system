@@ -7,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 
 const RegisterPage = () => {
   
-  const { register, isAuthenticated, loading } = useAuth();
+  const { register, isAuthenticated, isLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -80,7 +80,7 @@ const RegisterPage = () => {
               placeholder="Your full name"
               autoComplete="name"
               required
-              disabled={loading}
+              disabled={isLoading}
             />
 
             <InputField
@@ -93,7 +93,7 @@ const RegisterPage = () => {
               placeholder="you@example.com"
               autoComplete="email"
               required
-              disabled={loading}
+              disabled={isLoading}
             />
 
             <InputField
@@ -107,10 +107,10 @@ const RegisterPage = () => {
               autoComplete="new-password"
               showPasswordToggle
               required
-              disabled={loading}
+              disabled={isLoading}
             />
 
-            <Button type="submit" variant="primary" loading={loading} disabled={loading} className="w-full mt-xs">
+            <Button type="submit" variant="primary" loading={isLoading} disabled={isLoading} className="w-full mt-xs">
               Create account
             </Button>
           </form>

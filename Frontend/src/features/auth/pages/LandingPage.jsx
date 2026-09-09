@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import useAuth from '../hooks/useAuth';
 
 
 const features = [
@@ -26,7 +26,7 @@ const features = [
 ];
 
 const LandingPage = () => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-canvas-soft">

@@ -22,11 +22,12 @@ import {
 const useAuth = () => {
   const dispatch = useDispatch();
 
-  const { user, status, error, message } = useSelector((state) => state.auth);
+  const { user, status, authChecked, error, message } = useSelector((state) => state.auth);
 
   // Derived state
   const isAuthenticated = Boolean(user);
   const isLoading = status === "loading";
+  const isCheckingAuth = !authChecked;
 
   // -----------------------------
   // Login
@@ -70,7 +71,7 @@ const useAuth = () => {
       dispatch(authRequest());
 
       try {
-        const data = await registerUser(userData);
+        await registerUser(userData);
 
         const message = "Registration successful. Login to continue.";
 
@@ -172,7 +173,7 @@ const useAuth = () => {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await refreshToken();
+      await refreshToken();
 
       dispatch(successMessage("Session refreshed successfully."));
 
@@ -209,8 +210,6 @@ const useAuth = () => {
     try {
       const data = await getDashboardData();
 
-      dispatch(successMessage(data.message || "Dashboard data fetched successfully."));
-
       return {
         success: true,
         message: data.message || "Dashboard data fetched successfully.",
@@ -227,8 +226,6 @@ const useAuth = () => {
       }
 
       const message = error.message || "Failed to fetch dashboard data";
-
-      dispatch(authFailure(message));
 
       return {
         success: false,
@@ -257,6 +254,7 @@ const useAuth = () => {
 
     isAuthenticated,
     isLoading,
+    isCheckingAuth,
 
     login,
     register,
