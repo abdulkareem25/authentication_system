@@ -6,10 +6,11 @@ import {
 import validateRequest from "../middlewares/validate.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import { 
-  registerUser, 
-  loginUser,
-  logoutUser,
-  refreshToken
+  register, 
+  login,
+  logout,
+  refreshToken,
+  getMe
 } from "../controllers/auth.controller.js";
 
 
@@ -26,7 +27,7 @@ router.post(
   '/register',
   registerValidation,
   validateRequest,
-  registerUser
+  register
 )
 
 /**
@@ -40,7 +41,19 @@ router.post(
   '/login',
   loginValidation,
   validateRequest,
-  loginUser
+  login
+)
+
+/**
+ * @route GET /api/auth/me
+ * @desc Get the current logged-in user
+ * @access Private
+ */
+
+router.get(
+  '/me',
+  authMiddleware,
+  getMe
 )
 
 /**
@@ -52,7 +65,7 @@ router.post(
 router.post(
   '/logout',
   authMiddleware,
-  logoutUser
+  logout
 )
 
 /**

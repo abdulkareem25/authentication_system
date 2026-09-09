@@ -1,72 +1,101 @@
-const API_BASE = '/api';
+import axios from "axios";
 
-async function handleResponse(response) {
-  const contentType = response.headers.get('content-type');
-  const isJson = contentType && contentType.includes('application/json');
-  const data = isJson ? await response.json() : await response.text();
+const apiClient = axios.create({
+  baseURL: "/api",
+  withCredentials: true,
+});
 
-  if (!response.ok) {
-    const error = new Error(data?.message || data || `HTTP error ${response.status}`);
-    error.status = response.status;
-    error.data = data;
-    throw error;
+
+function handleRequestError(error) {
+  // Network error / server unreachable / request cancelled, etc.
+  if (!error.response) {
+    throw new Error(
+      error.message || "Unable to connect to the server"
+    );
   }
-  return data;
+
+  const normalizedError = new Error(
+    error.response.data?.message ||
+      error.message ||
+      "Request failed"
+  );
+
+  normalizedError.status = error.response.status;
+  normalizedError.data = error.response.data;
+
+  throw normalizedError;
 }
 
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(credentials),
-  });
-  return handleResponse(response);
+  try {
+    const response = await apiClient.post(
+      "/auth/login",
+      credentials
+    );
+
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
 }
 
 export async function registerUser(userData) {
-  const response = await fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(userData),
-  });
-  return handleResponse(response);
+  try {
+    const response = await apiClient.post(
+      "/auth/register",
+      userData
+    );
+
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
+}
+
+export async function getMe() {
+  try {
+    const response = await apiClient.get(
+      "/auth/me"
+    );
+
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
 }
 
 export async function logoutUser() {
-  const response = await fetch(`${API_BASE}/auth/logout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-  return handleResponse(response);
-}
+  try {
+    const response = await apiClient.post(
+      "/auth/logout"
+    );
 
-export async function getDashboardData() {
-  const response = await fetch(`${API_BASE}/dashboard`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-  return handleResponse(response);
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
 }
 
 export async function refreshToken() {
-  const response = await fetch(`${API_BASE}/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-  return handleResponse(response);
+  try {
+    const response = await apiClient.post(
+      "/auth/refresh-token"
+    );
+
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
+}
+
+export async function getDashboardData() {
+  try {
+    const response = await apiClient.get(
+      "/dashboard"
+    );
+
+    return response.data;
+  } catch (error) {
+    handleRequestError(error);
+  }
 }

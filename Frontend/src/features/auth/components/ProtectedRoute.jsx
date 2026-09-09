@@ -1,22 +1,11 @@
-
-import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-import { fetchDashboard, selectAuthLoading, selectIsAuthenticated } from '../states/auth.slice';
+import useAuth from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const loading = useSelector(selectAuthLoading);
-  const location = useLocation();
-  const sessionCheckStarted = useRef(false);
+  
+  const { isAuthenticated, loading } = useAuth();
 
-  useEffect(() => {
-    if (!isAuthenticated && !loading && !sessionCheckStarted.current) {
-      sessionCheckStarted.current = true;
-      dispatch(fetchDashboard());
-    }
-  }, [dispatch, isAuthenticated, loading]);
+  const location = useLocation();
 
   if (loading) {
     return (

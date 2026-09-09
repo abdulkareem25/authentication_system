@@ -1,24 +1,26 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import AuthCard from '../components/AuthCard';
 import Button from '../components/Button';
 import useAuth from '../hooks/useAuth';
-import { selectAuthError, selectAuthLoading, selectDashboardData, selectUser } from '../states/auth.slice';
 
 const DashboardPage = () => {
-  const { logout } = useAuth();
-  const user = useSelector(selectUser);
-  const dashboardData = useSelector(selectDashboardData);
-  const loading = useSelector(selectAuthLoading);
-  const error = useSelector(selectAuthError);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const { user, isAuthenticated, isLoading, error, fetchDashboardData, logout } = useAuth();
 
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    await logout();
-  };
+  const [dashboardData, setDashboardData] = useState(null);
+  
+  // Fetch dashboard data when the component mounts
+  useState(() => {
+    const fetchData = async () => {
+      const result = await fetchDashboardData();
+      if (result.success) {
+        setDashboardData(result.dashboardData);
+      }
+    };
 
-  if (loading && !user) {
+    fetchData();
+  }, [fetchDashboardData]);
+  
+  if (isLoading && !user) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
@@ -53,7 +55,7 @@ const DashboardPage = () => {
             <span className="text-body-sm text-ink-muted sm:inline">
               {user?.email}
             </span>
-            <Button variant="utility" onClick={handleLogout} disabled={loggingOut} loading={loggingOut}>
+            <Button variant="utility" onClick={logout} disabled={!isAuthenticated}>
               Log out
             </Button>
           </div>

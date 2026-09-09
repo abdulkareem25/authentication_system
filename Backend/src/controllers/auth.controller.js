@@ -5,7 +5,7 @@ import {
   authTokenGenerator,
 } from "../utils/tokenGenerator.js";
 
-export const registerUser = asyncHandler(async (req, res) => {
+export const register = asyncHandler(async (req, res) => {
 
   const { name, email, password } = req.body;
 
@@ -27,7 +27,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 })
 
-export const loginUser = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
 
   const { email, password } = req.body;
 
@@ -65,10 +65,35 @@ export const loginUser = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "User logged in successfully",
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    },
   });
 })
 
-export const logoutUser = asyncHandler(async (req, res) => {
+export const getMe = asyncHandler(async (req, res) => {
+
+  const { user } = req;
+
+  if (!user) {
+    const error = new Error("User not authenticated");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  res.status(200).json({
+    success: true,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+  });
+})
+
+export const logout = asyncHandler(async (req, res) => {
   
   // Clear the auth token cookie
   res.clearCookie("authToken", {

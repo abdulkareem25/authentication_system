@@ -1,78 +1,61 @@
 import { useState, useCallback } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import AuthCard from '../components/AuthCard';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import useAuth from '../hooks/useAuth';
-import { selectIsAuthenticated, selectAuthLoading, selectAuthError } from '../states/auth.slice';
 
 const RegisterPage = () => {
-  const { register, clearError } = useAuth();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const loading = useSelector(selectAuthLoading);
-  const authError = useSelector(selectAuthError);
+  
+  const { register, isAuthenticated, loading } = useAuth();
 
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+
   const [errors, setErrors] = useState({});
 
-  const validate = useCallback(() => {
-    const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Enter a valid email address';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
-
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-    if (authError) {
-      clearError();
-    }
-  };
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  }, []);
 
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (!validate()) return;
 
-      await register({
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-      });
+      // Reset errors
+      setErrors({});
+
+      // Basic validation
+      const newErrors = {};
+      if (!formData.name) newErrors.name = 'Name is required';
+      if (!formData.email) newErrors.email = 'Email is required';
+      if (!formData.password) newErrors.password = 'Password is required';
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+
+      // Call the register function from the useAuth hook
+      const result = await register(formData);
+
+      if (!result.success) {
+        setErrors({ general: result.error });
+      }
     },
-    [formData, register, validate]
+    [formData, register]
   );
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
-
-  const serverError =
-    typeof authError === 'string'
-      ? authError
-      : authError?.message || authError?.error || null;
 
   return (
     <main className="min-h-screen bg-canvas flex items-center justify-center p-md">
@@ -85,12 +68,6 @@ const RegisterPage = () => {
 
         <AuthCard>
           <h1 className="text-heading-2 text-ink text-center mb-lg">Create account</h1>
-
-          {serverError && (
-            <div className="error-alert" role="alert">
-              <p>{serverError}</p>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-md" noValidate>
             <InputField
