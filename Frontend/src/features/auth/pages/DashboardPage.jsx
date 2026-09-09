@@ -47,8 +47,8 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="bg-canvas">
-      <header className="nav-bar">
+    <div className="bg-canvas flex flex-col min-h-screen">
+      <header className="nav-bar py-md px-md border-b border-hairline">
         <div className="container flex flex-wrap items-center justify-between gap-sm">
           <span className="text-title font-semibold text-ink">Authentica</span>
           <div className="flex items-center gap-sm">
@@ -62,7 +62,7 @@ const DashboardPage = () => {
         </div>
       </header>
 
-      <main className="dashboard-content py-lg px-md">
+      <main className="dashboard-content py-lg px-md container">
         <div className="mb-lg">
           <h1 className="text-heading-1 dashboard-heading text-ink mb-xs">Welcome back{user?.name ? `, ${user.name}` : ''}</h1>
           <p className="text-body-md text-ink-muted">Manage your account and view your session details.</p>
@@ -130,7 +130,7 @@ const DashboardPage = () => {
         )}
       </main>
 
-      <footer className="footer">
+      <footer className="footer *:flex-1 py-lg px-md mt-auto border-t border-hairline">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-md">
           <p className="text-caption text-ink-muted">
             &copy; {new Date().getFullYear()} Authentica. All rights reserved.
